@@ -4,14 +4,16 @@ using ExamWalletSystem.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ExamWalletSystem.Migrations
 {
     [DbContext(typeof(WalletSystemDBContext))]
-    partial class WalletSystemDBContextModelSnapshot : ModelSnapshot
+    [Migration("20221204144235_AddAccouuntNumber2")]
+    partial class AddAccouuntNumber2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,11 +28,11 @@ namespace ExamWalletSystem.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("AccountNumberFrom")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long>("AccountNumberFrom")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("AccountNumberTo")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long>("AccountNumberTo")
+                        .HasColumnType("bigint");
 
                     b.Property<float>("Amount")
                         .HasColumnType("real");
@@ -43,11 +45,6 @@ namespace ExamWalletSystem.Migrations
 
                     b.Property<string>("TransactionType")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.HasKey("Id");
 
@@ -71,20 +68,12 @@ namespace ExamWalletSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PasswordSalt")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("RegisterDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.HasKey("Id");
 

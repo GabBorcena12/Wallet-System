@@ -24,7 +24,7 @@ namespace ExamWalletSystem.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> Register([FromBody] UserDto userDto)
+        public async Task<ActionResult> Register([FromBody] RegisterUserDto userDto)
         {
             var errors = await _repos.Register(userDto);
 
@@ -44,13 +44,13 @@ namespace ExamWalletSystem.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> login([FromBody] UserDto loginDto)
+        public async Task<ActionResult> login([FromBody] RegisterUserDto loginDto)
         {
-            var authResponse = await _repos.Login(loginDto);
+            var authResponse = await _repos.Login(loginDto); 
 
             //return errors when trying to login the user
             if (authResponse == null)
-            {
+            { 
                 return Unauthorized();
             }
 

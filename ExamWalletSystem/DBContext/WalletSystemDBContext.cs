@@ -12,6 +12,21 @@ namespace ExamWalletSystem.DBContext
         {
 
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            //For unique AccountNumber
+            modelBuilder.Entity<User>()
+              .HasIndex(x => x.AccountNumber)
+              .IsUnique();
+
+            modelBuilder.Entity<User>()
+            .Property(u => u.Version)
+            .IsRowVersion();
+
+            modelBuilder.Entity<Transaction>()
+            .Property(u => u.Version)
+            .IsRowVersion();
+        }
         public DbSet<User> tblUser { get; set; }
         public DbSet<Transaction> tblTransaction { get; set; }
     }

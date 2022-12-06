@@ -1,10 +1,14 @@
-﻿using ExamWalletSystem.DBContext;
+﻿using AutoMapper;
+using ExamWalletSystem.DBContext;
 using ExamWalletSystem.Interface;
 using ExamWalletSystem.Model;
 using ExamWalletSystem.Model.Dto;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using System;
@@ -12,8 +16,10 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ExamWalletSystem.Repository
 {
@@ -21,71 +27,90 @@ namespace ExamWalletSystem.Repository
     {
         private readonly WalletSystemDBContext _context; 
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
         private User _user;
-        public AccountRepository(WalletSystemDBContext context, IConfiguration configuration)
+        private readonly string _pepper;
+        private readonly int _iteration = 3;
+        public AccountRepository(WalletSystemDBContext context, IConfiguration configuration, IMapper mapper)
         {
             this._context = context;
-            this._configuration = configuration; 
+            this._configuration = configuration;
+            this._mapper = mapper;
+            _pepper = Environment.GetEnvironmentVariable("PasswordHashExamplePepper");
         }
 
-        public async Task<bool> CheckUserName(UserDto userDto) {
-            var query = await _context.tblUser.FindAsync(userDto.UserName);
+        public async Task<bool> CheckUserName(string userName) {
+            var query = await _context.tblUser.FirstOrDefaultAsync(u => u.UserName == userName);
             if (query == null)
             {
                 return false;
             }
             return  true;
         }
-        public async Task<bool> VerifyPassword(UserDto userDto)
-        {
-            var query = await _context.tblUser.FirstOrDefaultAsync(u => u.UserName == userDto.UserName && u.Password == userDto.Password);
-
-            if (query == null)
+        public async Task<bool> VerifyPassword(RegisterUserDto userDto)
+        { 
+            var user = await _context.tblUser.FirstOrDefaultAsync(u => u.UserName == userDto.UserName);
+            if (user == null)
             {
-                return false;
+                throw new Exception("Username does not exist.");
             }
+
+            var passwordHash = ComputeHash(userDto.Password, user.PasswordSalt, _pepper, _iteration);
+
+            if (user.Password != passwordHash) { 
+                throw new Exception("Username or password did not match.");
+            }
+
             return true;
         }
-        public async Task<TokenResponseDto> Login(UserDto userDto)
+        public async Task<TokenResponseDto> Login(RegisterUserDto userDto)
         {
             bool isValidUser = false;
             bool isUserExist = false;
             bool isValidPassword = false;
 
-            isUserExist = await CheckUserName(userDto);
+
+            isUserExist = await CheckUserName(userDto.UserName);
             isValidPassword = await VerifyPassword(userDto);
 
             if (isValidPassword == true || isValidUser == true)
-            {
-                _user = await _context.tblUser.FindAsync(userDto.Id);
+            { 
+                _user = await _context.tblUser.FirstOrDefaultAsync(u => u.UserName == userDto.UserName); 
+
                 var token = await GenerateToken();
                 return new TokenResponseDto
                 {
                     Token = token,
                     UserId = _user.UserName,
-                    RefreshToken = await CreateResfreshToken()
+                    RefreshToken = CreateResfreshToken()
                 };
             }
 
             return null; 
 
         }
-
-        public async Task<bool> Register(UserDto model)
+        public async Task<bool> Register(RegisterUserDto model)
         {
-            try
+            string generateSalt = GenerateSalt();
+            var HashedPassword  = ComputeHash(model.Password, generateSalt, _pepper, _iteration);
+
+            bool isUserExist = await CheckUserName(model.UserName);
+            if (!isUserExist)
             {
-                await _context.AddAsync(model);
+                var user = _mapper.Map<User>(model);
+                user.Password = HashedPassword;
+                user.PasswordSalt = generateSalt;
+                await _context.AddAsync(user);
                 await _context.SaveChangesAsync();
 
                 return true;
             }
-            catch { 
+            else
+            {
                 return false;
-            }
+            } 
         }
-
-        public async Task<string> GenerateToken()
+        public Task<string> GenerateToken()
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
 
@@ -107,15 +132,9 @@ namespace ExamWalletSystem.Repository
                 signingCredentials: credentials
                 );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        /*public Task<AuthResponseDto> VerifyResfreshToken(AuthResponseDto authResponseDto)
-        {
-            throw new NotImplementedException();
-        }*/
-
-        public async Task<string> CreateResfreshToken()
+            return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(token));
+        } 
+        public string CreateResfreshToken()
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
 
@@ -140,6 +159,27 @@ namespace ExamWalletSystem.Repository
                 );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public static string ComputeHash(string password, string salt, string pepper, int iteration)
+        {
+            if (iteration <= 0) return password;
+
+            using var sha256 = SHA256.Create();
+            var passwordSaltPepper = $"{password}{salt}{pepper}";
+            var byteValue = Encoding.UTF8.GetBytes(passwordSaltPepper);
+            var byteHash = sha256.ComputeHash(byteValue);
+            var hash = Convert.ToBase64String(byteHash);
+            return ComputeHash(hash, salt, pepper, iteration - 1);
+        }
+
+        public static string GenerateSalt()
+        {
+            using var rng = RandomNumberGenerator.Create();
+            var byteSalt = new byte[16];
+            rng.GetBytes(byteSalt);
+            var salt = Convert.ToBase64String(byteSalt);
+            return salt;
         }
     }
 }

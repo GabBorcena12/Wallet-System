@@ -4,14 +4,16 @@ using ExamWalletSystem.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ExamWalletSystem.Migrations
 {
     [DbContext(typeof(WalletSystemDBContext))]
-    partial class WalletSystemDBContextModelSnapshot : ModelSnapshot
+    [Migration("20221206145409_passwordsaltcol")]
+    partial class passwordsaltcol
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,11 +46,6 @@ namespace ExamWalletSystem.Migrations
                     b.Property<string>("TransactionType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
                     b.HasKey("Id");
 
                     b.ToTable("tblTransaction");
@@ -80,11 +77,6 @@ namespace ExamWalletSystem.Migrations
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.HasKey("Id");
 

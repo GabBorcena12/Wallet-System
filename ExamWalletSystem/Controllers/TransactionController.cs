@@ -7,10 +7,13 @@ using ExamWalletSystem.Model;
 using ExamWalletSystem.Model.Dto;
 using ExamWalletSystem.Repository;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace ExamWalletSystem.Controllers
 {
     [Route("api/[controller]")]
+    //[Authorize]
     [ApiController]
     public class TransactionController : ControllerBase
     {
@@ -23,11 +26,13 @@ namespace ExamWalletSystem.Controllers
 
         [HttpGet] 
         [Route("api/[controller]/GetUserTransaction")]
-        public ActionResult<IEnumerable<TransactionDto>> GetUserTransaction()
+        public async Task<ActionResult<List<TransactionDto>>> GetUserTransaction()
         { 
             try
             {
-                var result =  _reposiitory.GetTransaction("GABB0812");
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                var result =  await _reposiitory.GetTransaction(userId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -38,18 +43,18 @@ namespace ExamWalletSystem.Controllers
 
         [HttpPatch] 
         [Route("api/[controller]/Deposit")]
-        public IActionResult Deposit(TransactionDto model)
+        public async Task<IActionResult> Deposit(DepositDto model)
         {
             try
             {
-                var result = _reposiitory.Deposit(model);
+                var result = await _reposiitory.Deposit(model);
 
                 if (result == null)
                 { 
                     return BadRequest();
                 }
                  
-                return Ok($"You have successfully deposited $ { model.Amount } using this Account Number:  { model.AccountNumberFrom} .");
+                return Ok($"You have successfully deposited $ { model.Amount } to this Account Number:  { model.AccountNumberTo} .");
             }
             catch (Exception ex)
             {
@@ -59,11 +64,11 @@ namespace ExamWalletSystem.Controllers
 
         [HttpPatch]
         [Route("api/[controller]/Withdraw")]
-        public IActionResult Withdraw(TransactionDto model)
+        public async Task<IActionResult> Withdraw(WithdrawDto model)
         {
             try
             {
-                var result = _reposiitory.Withdraw(model);
+                var result = await _reposiitory.Withdraw(model);
 
                 if (result == null)
                 {
@@ -80,11 +85,11 @@ namespace ExamWalletSystem.Controllers
 
         [HttpPatch]
         [Route("api/[controller]/FundTransfer")]
-        public IActionResult FundTransfer(TransactionDto model)
+        public async Task<IActionResult> FundTransfer(TransactDto model)
         {
             try
             {
-                var result = _reposiitory.FundTransfer(model);
+                var result = await _reposiitory.FundTransfer(model);
 
                 if (result == null)
                 {

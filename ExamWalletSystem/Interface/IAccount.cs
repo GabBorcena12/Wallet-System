@@ -8,9 +8,8 @@ namespace ExamWalletSystem.Interface
 {
     public interface IAccount
     {
-        Task<bool> Register(UserDto model); 
-        Task<TokenResponseDto> Login(UserDto loginDto);
-        public Task<string> CreateResfreshToken();
-        //public Task<AuthResponseDto> VerifyResfreshToken(AuthResponseDto authResponseDto);
+        Task<bool> Register(RegisterUserDto model); 
+        Task<TokenResponseDto> Login(RegisterUserDto loginDto);
+        public string CreateResfreshToken();
     }
 }
