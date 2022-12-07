@@ -1,4 +1,5 @@
-﻿using ExamWalletSystem.Model;
+﻿using ExamWalletSystem.Interface;
+using ExamWalletSystem.Model;
 using ExamWalletSystem.Model.Dto;
 using ExamWalletSystem.Repository;
 using Microsoft.AspNetCore.Http;
@@ -11,9 +12,9 @@ namespace ExamWalletSystem.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly AccountRepository _repos;
+        private readonly IAccount _repos;
 
-        public AccountController(AccountRepository repos)
+        public AccountController(IAccount repos)
         {
             this._repos = repos;
         }

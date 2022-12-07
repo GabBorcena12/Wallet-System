@@ -18,10 +18,7 @@ using Xunit;
 namespace WalletSystem.API.Test
 {
     public class TransactionControllerTest
-    {
-        public TransactionControllerTest()
-        {
-        }
+    { 
         [Fact]
         public async Task GetTransactionTest()
         {
@@ -33,7 +30,8 @@ namespace WalletSystem.API.Test
             }, "mock"));
 
             int count = 6;
-            string userId = "string test 123";
+            string userId = "string test 123"; //Replace with UserId
+
             var fakeTransaction = A.CollectionOfDummy<TransactionDto>(count).ToList();
             var dataStore = A.Fake<ITransaction>();
             A.CallTo(() => dataStore.GetTransaction(userId)).Returns(Task.FromResult(fakeTransaction));
@@ -60,7 +58,7 @@ namespace WalletSystem.API.Test
             // Arrange
             DepositDto testItem = new DepositDto()
             {
-                AccountNumberTo = "126427770499",
+                AccountNumberTo = "126427770499", //Replace with Account Number
                 Amount = 1000
             };
             // Act
@@ -81,7 +79,7 @@ namespace WalletSystem.API.Test
             // Arrange
             WithdrawDto testItem = new WithdrawDto()
             {
-                AccountNumberFrom = "126427770499",
+                AccountNumberFrom = "126427770499", //Replace with Account Number
                 Amount = 1000
             };
             // Act
@@ -102,8 +100,8 @@ namespace WalletSystem.API.Test
             // Arrange
             TransactDto testItem = new TransactDto()
             {
-                AccountNumberTo = "126427770499",
-                AccountNumberFrom = "126663766484",
+                AccountNumberTo = "126427770499", //Replace with Account Number
+                AccountNumberFrom = "126663766484", //Replace with Account Number
                 Amount = 1000
             };
             // Act
