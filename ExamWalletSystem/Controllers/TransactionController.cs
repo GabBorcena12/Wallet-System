@@ -42,7 +42,7 @@ namespace ExamWalletSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Problem($"Something went wrong with {nameof(GetUserTransaction)}. Error Message: {ex.Message}.", statusCode: 500);
+                return BadRequest($"Something went wrong with {nameof(GetUserTransaction)}. Error Message: {ex.Message}.");
             }
         }
 
@@ -63,7 +63,7 @@ namespace ExamWalletSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Problem($"Something went wrong with {nameof(Deposit)}. Error Message: {ex.Message}.", statusCode: 500);
+                return BadRequest($"Something went wrong with {nameof(Deposit)}. Error Message: {ex.Message}.");
             } 
         }
 
@@ -84,7 +84,7 @@ namespace ExamWalletSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Problem($"Something went wrong with {nameof(Withdraw)}. Error Message: {ex.Message}.", statusCode: 500);
+                return BadRequest($"Something went wrong with {nameof(Withdraw)}. Error Message: {ex.Message}.");
             }
         }
 
@@ -94,9 +94,15 @@ namespace ExamWalletSystem.Controllers
         {
             try
             {
-                var result = await _reposiitory.FundTransfer(model);
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var result = await _reposiitory.FundTransfer(model, userId);
 
                 if (result == null)
+                {
+                    return BadRequest();
+                } 
+
+                if (model.AccountNumberFrom == model.AccountNumberTo)
                 {
                     return BadRequest();
                 }
@@ -105,7 +111,7 @@ namespace ExamWalletSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Problem($"Something went wrong with {nameof(FundTransfer)}. Error Message: {ex.Message}.", statusCode: 500);
+                return BadRequest($"Something went wrong with {nameof(FundTransfer)}. Error Message: {ex.Message}.");
             }
         }
     }

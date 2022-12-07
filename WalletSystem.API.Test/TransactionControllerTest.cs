@@ -97,6 +97,12 @@ namespace WalletSystem.API.Test
         [Fact]
         public async Task FundTransferTest()
         {
+
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, "string test 123"),
+            }, "mock"));
+
             // Arrange
             TransactDto testItem = new TransactDto()
             {
@@ -104,8 +110,7 @@ namespace WalletSystem.API.Test
                 AccountNumberFrom = "126663766484", //Replace with Account Number
                 Amount = 1000
             };
-            // Act
-
+            // Act 
             int count = 1;
             var fakeTransaction = A.CollectionOfDummy<TransactDto>(count).AsEnumerable();
             var dataStore = A.Fake<ITransaction>();

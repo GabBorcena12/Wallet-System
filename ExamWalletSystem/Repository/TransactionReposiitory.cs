@@ -10,7 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
-using System.Threading.Tasks;
+using System.Security.Claims;
+using System.Threading.Tasks; 
 
 namespace ExamWalletSystem.Repository
 {
@@ -32,23 +33,24 @@ namespace ExamWalletSystem.Repository
             var mapResult = mapper.Map<List<TransactionDto>>(result);
             return mapResult;
         }
-        public async Task<AuthResponseDto> FundTransfer(TransactDto transactionDto)
+        public async Task<AuthResponseDto> FundTransfer(TransactDto transactionDto, string userId)
         {
-            var mapData = mapper.Map<Transaction>(transactionDto);
+            var mapData = mapper.Map<Transaction>(transactionDto); 
             //Verify Account Number
             bool checkAccFrom = await CheckAccountNumber(transactionDto.AccountNumberFrom);
             bool checkAccTo = await CheckAccountNumber(transactionDto.AccountNumberTo);
             //Get Account Number Details
             var getAccountNumberTo = await _db.tblUser.Where(q => q.AccountNumber == transactionDto.AccountNumberTo).FirstOrDefaultAsync();
             var getAccountNumberFrom = await _db.tblUser.Where(q => q.AccountNumber == transactionDto.AccountNumberFrom).FirstOrDefaultAsync();
-
+             
             //Check Balance available
             float checkBalance = getAccountNumberFrom.Balance - transactionDto.Amount;
-            if (checkAccFrom == true && checkAccTo == true && transactionDto.Amount > 0 && checkBalance >= 0)
+
+            if (checkAccFrom == true && checkAccTo == true && transactionDto.Amount > 0  
+            && checkBalance >= 0  && getAccountNumberFrom.UserName == userId)  
             {
                 try
-                { 
-                    //Insert Dynamic Data for Logging
+                {  
                     float balance = getAccountNumberTo.Balance + transactionDto.Amount;
                     float deductBalance = getAccountNumberFrom.Balance - transactionDto.Amount;
 
