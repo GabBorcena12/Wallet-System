@@ -9,17 +9,18 @@ using ExamWalletSystem.Repository;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ExamWalletSystem.Interface;
 
 namespace ExamWalletSystem.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     [ApiController]
     public class TransactionController : ControllerBase
     {
-        private readonly TransactionReposiitory _reposiitory;
+        private readonly ITransaction _reposiitory;
 
-        public TransactionController(TransactionReposiitory reposiitory)
+        public TransactionController(ITransaction reposiitory)
         {
             this._reposiitory = reposiitory;
         }
@@ -31,6 +32,10 @@ namespace ExamWalletSystem.Controllers
             try
             {
                 string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userId == null)
+                {
+                    return Unauthorized();
+                }
 
                 var result =  await _reposiitory.GetTransaction(userId);
                 return Ok(result);
