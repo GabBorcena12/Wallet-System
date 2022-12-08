@@ -22,11 +22,14 @@ namespace ExamWalletSystem.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
+        [MaxLength(30)]
         [DataType(DataType.Text, ErrorMessage = "Username is Required")]
         public string UserName { get; set; }
         [Required]
+        [MaxLength(30)]
         [DataType(DataType.Password, ErrorMessage = "Password is Required")]
         public string Password { get; set; }
+        [MaxLength(12)]
         public string AccountNumber { get; set; }
         public float Balance { get; set; }
         public DateTime RegisterDate { get; set; }

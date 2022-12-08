@@ -27,6 +27,10 @@ namespace ExamWalletSystem.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> Register([FromBody] RegisterUserDto userDto)
         {
+            if (userDto.UserName == "" || userDto.Password == "")
+            {
+                return BadRequest();
+            }
             var errors = await _repos.Register(userDto);
 
             if (!errors)
@@ -47,6 +51,10 @@ namespace ExamWalletSystem.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> login([FromBody] RegisterUserDto loginDto)
         {
+            if (loginDto.UserName == "" || loginDto.Password == "")
+            {
+                return BadRequest();
+            }
             var authResponse = await _repos.Login(loginDto); 
 
             //return errors when trying to login the user

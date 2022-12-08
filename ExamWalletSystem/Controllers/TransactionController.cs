@@ -52,6 +52,9 @@ namespace ExamWalletSystem.Controllers
         {
             try
             {
+                if (model.AccountNumberTo == "" || model.Amount == 0) { 
+                    return BadRequest();
+                }
                 var result = await _reposiitory.Deposit(model);
 
                 if (result == null)
@@ -73,6 +76,11 @@ namespace ExamWalletSystem.Controllers
         {
             try
             {
+
+                if (model.AccountNumberFrom == "" || model.Amount == 0)
+                {
+                    return BadRequest();
+                }
                 var result = await _reposiitory.Withdraw(model);
 
                 if (result == null)
@@ -94,6 +102,11 @@ namespace ExamWalletSystem.Controllers
         {
             try
             {
+                if (model.AccountNumberFrom == "" || model.AccountNumberTo == "" || model.Amount == 0)
+                {
+                    return BadRequest();
+                }
+
                 string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 var result = await _reposiitory.FundTransfer(model, userId);
 
