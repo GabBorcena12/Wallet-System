@@ -10,8 +10,8 @@ namespace ExamWalletSystem.Model
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; } 
-        public string AccountNumberFrom { get; set; } 
-        public string AccountNumberTo { get; set; }
+        public long AccountNumberFrom { get; set; } 
+        public long AccountNumberTo { get; set; }
         public string TransactionType { get; set; }
         public float Amount { get; set; }
         public float EndBalance { get; set; }

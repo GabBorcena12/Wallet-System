@@ -4,6 +4,7 @@ using ExamWalletSystem.Model.Dto;
 using ExamWalletSystem.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace ExamWalletSystem.Controllers
@@ -26,20 +27,27 @@ namespace ExamWalletSystem.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> Register([FromBody] RegisterUserDto userDto)
-        {
-            if (userDto.UserName == "" || userDto.Password == "")
-            {
-                return BadRequest();
+        { 
+            try
+            { 
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                } 
+
+                var errors = await _repos.Register(userDto);
+
+                if (!errors)
+                {
+                    return BadRequest();
+                }
+
+                return StatusCode(StatusCodes.Status200OK, new { message = "User has been registered." });
             }
-            var errors = await _repos.Register(userDto);
-
-            if (!errors)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = ex.Message });
             }
-
-            return Ok();
-
         }
 
 
@@ -51,19 +59,28 @@ namespace ExamWalletSystem.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> login([FromBody] RegisterUserDto loginDto)
         {
-            if (loginDto.UserName == "" || loginDto.Password == "")
+
+            try
             {
-                return BadRequest();
-            }
-            var authResponse = await _repos.Login(loginDto); 
 
-            //return errors when trying to login the user
-            if (authResponse == null)
-            { 
-                return Unauthorized();
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-            return Ok(authResponse);
+                var authResponse = await _repos.Login(loginDto);
+
+                if (authResponse.UserId == null && authResponse.Token == null)
+                {
+                    return Unauthorized();
+                }
+
+                return Ok(authResponse);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new { message = ex.Message });
+            }
         }
     }
 }

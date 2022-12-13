@@ -36,33 +36,9 @@ namespace ExamWalletSystem.Repository
             this._context = context;
             this._configuration = configuration;
             this._mapper = mapper;
-            _pepper = Environment.GetEnvironmentVariable("PasswordHashExamplePepper");
+            _pepper = Environment.GetEnvironmentVariable("PasswordHashPepper");
         }
 
-        public async Task<bool> CheckUserName(string userName) {
-            var query = await _context.tblUser.FirstOrDefaultAsync(u => u.UserName == userName);
-            if (query == null)
-            {
-                return false;
-            }
-            return  true;
-        }
-        public async Task<bool> VerifyPassword(RegisterUserDto userDto)
-        { 
-            var user = await _context.tblUser.FirstOrDefaultAsync(u => u.UserName == userDto.UserName);
-            if (user == null)
-            {
-                throw new Exception("Username does not exist.");
-            }
-
-            var passwordHash = ComputeHash(userDto.Password, user.PasswordSalt, _pepper, _iteration);
-
-            if (user.Password != passwordHash) { 
-                throw new Exception("Username or password did not match.");
-            }
-
-            return true;
-        }
         public async Task<TokenResponseDto> Login(RegisterUserDto userDto)
         {
             bool isValidUser = false;
@@ -74,8 +50,8 @@ namespace ExamWalletSystem.Repository
             isValidPassword = await VerifyPassword(userDto);
 
             if (isValidPassword == true || isValidUser == true)
-            { 
-                _user = await _context.tblUser.FirstOrDefaultAsync(u => u.UserName == userDto.UserName); 
+            {
+                _user = await _context.tblUser.FirstOrDefaultAsync(u => u.UserName == userDto.UserName);
 
                 var token = await GenerateToken();
                 return new TokenResponseDto
@@ -86,14 +62,19 @@ namespace ExamWalletSystem.Repository
                 };
             }
 
-            return null; 
+            return new TokenResponseDto
+            {
+                Token = null,
+                UserId = null,
+                RefreshToken = null
+            };
 
         }
         public async Task<bool> Register(RegisterUserDto model)
         {
             string generateSalt = GenerateSalt();
-            var HashedPassword  = ComputeHash(model.Password, generateSalt, _pepper, _iteration);
-
+            var HashedPassword = ComputeHash(model.Password, generateSalt, _pepper, _iteration);
+            
             bool isUserExist = await CheckUserName(model.UserName);
             if (!isUserExist)
             {
@@ -108,9 +89,33 @@ namespace ExamWalletSystem.Repository
             else
             {
                 return false;
-            } 
+            }
+        } 
+        private async Task<bool> CheckUserName(string userName) {
+            var query = await _context.tblUser.FirstOrDefaultAsync(u => u.UserName == userName);
+            if (query == null)
+            {
+                return false;
+            }
+            return  true;
         }
-        public Task<string> GenerateToken()
+        private async Task<bool> VerifyPassword(RegisterUserDto userDto)
+        { 
+            var user = await _context.tblUser.FirstOrDefaultAsync(u => u.UserName == userDto.UserName);
+            if (user == null)
+            {
+                throw new Exception("Username does not exist.");
+            }
+
+            var passwordHash = ComputeHash(userDto.Password, user.PasswordSalt, _pepper, _iteration);
+
+            if (user.Password != passwordHash) { 
+                throw new Exception("Username or password did not match.");
+            }
+
+            return true;
+        } 
+        private Task<string> GenerateToken()
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
 
@@ -134,7 +139,7 @@ namespace ExamWalletSystem.Repository
 
             return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(token));
         } 
-        public string CreateResfreshToken()
+        private string CreateResfreshToken()
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
 
@@ -159,9 +164,8 @@ namespace ExamWalletSystem.Repository
                 );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        public static string ComputeHash(string password, string salt, string pepper, int iteration)
+        } 
+        private static string ComputeHash(string password, string salt, string pepper, int iteration)
         {
             if (iteration <= 0) return password;
 
@@ -172,8 +176,7 @@ namespace ExamWalletSystem.Repository
             var hash = Convert.ToBase64String(byteHash);
             return ComputeHash(hash, salt, pepper, iteration - 1);
         }
-
-        public static string GenerateSalt()
+        private static string GenerateSalt()
         {
             using var rng = RandomNumberGenerator.Create();
             var byteSalt = new byte[16];

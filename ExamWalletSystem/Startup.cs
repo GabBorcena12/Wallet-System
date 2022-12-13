@@ -107,6 +107,9 @@ namespace ExamWalletSystem
             services.AddScoped<ITransaction, TransactionReposiitory>();
             services.AddScoped<TransactionReposiitory>();
 
+            services.AddControllers(
+                options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
+
 
         }
 

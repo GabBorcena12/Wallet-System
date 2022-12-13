@@ -10,6 +10,6 @@ namespace ExamWalletSystem.Interface
     {
         Task<bool> Register(RegisterUserDto model); 
         Task<TokenResponseDto> Login(RegisterUserDto loginDto);
-        public string CreateResfreshToken();
+        //public string CreateResfreshToken();
     }
 }

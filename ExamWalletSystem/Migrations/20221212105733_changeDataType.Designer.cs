@@ -4,14 +4,16 @@ using ExamWalletSystem.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ExamWalletSystem.Migrations
 {
     [DbContext(typeof(WalletSystemDBContext))]
-    partial class WalletSystemDBContextModelSnapshot : ModelSnapshot
+    [Migration("20221212105733_changeDataType")]
+    partial class changeDataType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,7 +72,8 @@ namespace ExamWalletSystem.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("PasswordSalt")
                         .HasColumnType("nvarchar(max)");

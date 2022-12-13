@@ -25,19 +25,18 @@ namespace ExamWalletSystem.Model
         [MaxLength(30)]
         [DataType(DataType.Text, ErrorMessage = "Username is Required")]
         public string UserName { get; set; }
-        [Required]
-        [MaxLength(30)]
+        [Required] 
         [DataType(DataType.Password, ErrorMessage = "Password is Required")]
         public string Password { get; set; }
         [MaxLength(12)]
-        public string AccountNumber { get; set; }
+        public long AccountNumber { get; set; }
         public float Balance { get; set; }
         public DateTime RegisterDate { get; set; }
         public string PasswordSalt { get; set; }
         [Timestamp]
         public byte[] Version { get; set; }
 
-        private static string GenerateRandomString(int size)
+        private static long GenerateRandomString(int size)
         { 
 
             Random r = new Random();
@@ -49,8 +48,7 @@ namespace ExamWalletSystem.Model
              
             var generateId = GetCurrentDate + Guid.NewGuid().ToString().Replace("-", string.Empty);
             var randomCode = Regex.Replace(generateId, "[a-zA-Z]", string.Empty).Substring(0, 12);
-
-            var generatedNumber = randomCode.ToString();
+            long generatedNumber = (long)Convert.ToDouble(randomCode); 
             return generatedNumber;
         }
 

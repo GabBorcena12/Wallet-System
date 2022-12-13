@@ -2,7 +2,7 @@
 {
     public class DepositDto
     { 
-        public string AccountNumberTo { get; set; }
+        public long AccountNumberTo { get; set; }
         public float Amount { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 {
     public class WithdrawDto
     {
-        public string AccountNumberFrom { get; set; } 
+        public long AccountNumberFrom { get; set; } 
         public float Amount { get; set; }
     }
 }
