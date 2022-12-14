@@ -26,7 +26,7 @@ namespace WalletSystem.API.Test.TestController
         }
 
         [Fact]
-        public async Task Register_ActionResult()
+        public async Task Register_TestCase001()
         { 
             int count = 1;
             var fakeTransaction = A.CollectionOfDummy<RegisterUserDto>(count);
@@ -38,7 +38,7 @@ namespace WalletSystem.API.Test.TestController
         }
 
         [Fact]
-        public async Task Register_ReturnBadRequest()
+        public async Task Register_TestCase002()
         {
 
             // Arrange & Act
@@ -52,8 +52,28 @@ namespace WalletSystem.API.Test.TestController
             // Assert
             Assert.IsType<BadRequestObjectResult>(result); 
         }
+
         [Fact]
-        public async Task Login_ActionResult()
+        public async Task Register_TestCase003()
+        {
+            // Arrange & Act
+            RegisterUserDto userDto = new RegisterUserDto()
+            {
+                UserName = "",
+                Password = ""
+            };
+            var mockRepo = new Mock<IAccount>();
+            var controller = new AccountController(mockRepo.Object);
+
+            // Act
+            var result = await controller.Register(userDto);
+
+            // Assert
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task Login_TestCase001()
         {  
             int count = 1;
             var fakeTransaction = A.CollectionOfDummy<RegisterUserDto>(count);
@@ -65,7 +85,7 @@ namespace WalletSystem.API.Test.TestController
         }
 
         [Fact]
-        public async Task Login_ReturnBadRequest()
+        public async Task Login_TestCase002()
         {
 
             // Arrange & Act
@@ -79,6 +99,26 @@ namespace WalletSystem.API.Test.TestController
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
 
+        }
+
+
+        [Fact]
+        public async Task Login_TestCase003()
+        {
+            // Arrange & Act
+            RegisterUserDto userDto = new RegisterUserDto()
+            {
+                UserName = "",
+                Password = ""
+            };
+            var mockRepo = new Mock<IAccount>();
+            var controller = new AccountController(mockRepo.Object);
+
+            // Act
+            var result = await controller.login(userDto);
+
+            // Assert
+            Assert.IsType<ObjectResult>(result);
         }
     }
 }

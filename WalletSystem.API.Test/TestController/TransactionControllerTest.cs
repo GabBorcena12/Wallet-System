@@ -75,6 +75,7 @@ namespace WalletSystem.API.Test
             var result = actionResult.Result as OkObjectResult;
             var returnTransaction = result.Value as IList<TransactionDto>;
             Assert.Equal(count, returnTransaction.Count);
+            Assert.NotNull(actionResult); 
         }
 
         [Fact]
@@ -104,9 +105,9 @@ namespace WalletSystem.API.Test
 
 
         [Fact]
-        public async Task Deposit_IActionResult()
+        public async Task Deposit_TestCase001()
         {
-            //Arrange
+            //Arrange 
             var fakeTransaction = A.CollectionOfDummy<DepositDto>(1).AsEnumerable();
             var dataStore = A.Fake<ITransaction>();
 
@@ -114,11 +115,12 @@ namespace WalletSystem.API.Test
             var controller = new TransactionController(dataStore);
             var createdResponse = controller.Deposit(_depositDto);
             // Assert 
-            await Assert.IsType<Task<IActionResult>>(createdResponse); 
+            await Assert.IsType<Task<IActionResult>>(createdResponse);
+            Assert.NotNull(createdResponse);
         }
-
+         
         [Fact]
-        public async Task Deposit_ReturnBadRequest()
+        public async Task Deposit_TestCase002()
         {
             // Arrange & Act
             var mockRepo = new Mock<ITransaction>();
@@ -129,11 +131,72 @@ namespace WalletSystem.API.Test
             var result = await controller.Deposit(model: null);
 
             // Assert
-            Assert.IsType<BadRequestObjectResult>(result);
-        } 
+            Assert.IsType<BadRequestObjectResult>(result); 
+        }
 
         [Fact]
-        public async Task Withdraw_IActionResult()
+        public async Task Deposit_TestCase003()
+        {
+            // Arrange & Act
+            DepositDto depositDto = new DepositDto()
+            {
+                AccountNumberTo = 121249488198,
+                Amount = 0
+            };
+
+            var mockRepo = new Mock<ITransaction>();
+            var controller = new TransactionController(mockRepo.Object); 
+
+            // Act
+            var result = await controller.Deposit(model: depositDto);
+
+            // Assert
+            Assert.IsType<ObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task Deposit_TestCase004()
+        {
+            // Arrange & Act
+            DepositDto depositDto = new DepositDto()
+            {
+                AccountNumberTo = 0,
+                Amount = 1000
+            };
+
+            var mockRepo = new Mock<ITransaction>();
+            var controller = new TransactionController(mockRepo.Object);
+
+            // Act
+            var result = await controller.Deposit(model: depositDto);
+
+            // Assert
+            Assert.IsType<ObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task Deposit_TestCase005()
+        {
+            // Arrange & Act
+            DepositDto depositDto = new DepositDto()
+            {
+                AccountNumberTo = 0,
+                Amount = 0
+            };
+
+            var mockRepo = new Mock<ITransaction>();
+            var controller = new TransactionController(mockRepo.Object);
+
+            // Act
+            var result = await controller.Deposit(model: depositDto);
+
+            // Assert
+            Assert.IsType<ObjectResult>(result);
+        }
+
+
+        [Fact]
+        public async Task Withdraw_TestCase001()
         {
             //Arrange
             var fakeTransaction = A.CollectionOfDummy<WithdrawDto>(1).AsEnumerable();
@@ -144,10 +207,11 @@ namespace WalletSystem.API.Test
             var createdResponse = controller.Withdraw(_withdrawDto);
             // Assert 
             await Assert.IsType<Task<IActionResult>>(createdResponse);
+            Assert.NotNull(createdResponse);
         }
 
         [Fact]
-        public async Task Withdraw_ReturnBadRequest()
+        public async Task Withdraw_TestCase002()
         {
             // Arrange & Act
             var mockRepo = new Mock<ITransaction>();
@@ -162,7 +226,63 @@ namespace WalletSystem.API.Test
         }
 
         [Fact]
-        public async Task FundTransfer_IActionResult()
+        public async Task Withdraw_TestCase003()
+        {
+            // Arrange & Act
+            WithdrawDto withdrawDto = new WithdrawDto()
+            {
+                AccountNumberFrom = 121249488198,
+                Amount = 0
+            };
+            var mockRepo = new Mock<ITransaction>();
+            var controller = new TransactionController(mockRepo.Object); 
+
+            // Act
+            var result = await controller.Withdraw(model: withdrawDto);
+
+            // Assert
+            Assert.IsType<ObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task Withdraw_TestCase004()
+        {
+            // Arrange & Act
+            WithdrawDto withdrawDto = new WithdrawDto()
+            {
+                AccountNumberFrom = 0,
+                Amount = 1000
+            };
+            var mockRepo = new Mock<ITransaction>();
+            var controller = new TransactionController(mockRepo.Object);
+
+            // Act
+            var result = await controller.Withdraw(model: withdrawDto);
+
+            // Assert
+            Assert.IsType<ObjectResult>(result);
+        }
+        [Fact]
+        public async Task Withdraw_TestCase005()
+        {
+            // Arrange & Act
+            WithdrawDto withdrawDto = new WithdrawDto()
+            {
+                AccountNumberFrom = 0,
+                Amount = 0
+            };
+            var mockRepo = new Mock<ITransaction>();
+            var controller = new TransactionController(mockRepo.Object);
+
+            // Act
+            var result = await controller.Withdraw(model: withdrawDto);
+
+            // Assert
+            Assert.IsType<ObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task FundTransfer_TestCase001()
         {
             //Arrange
             var fakeTransaction = A.CollectionOfDummy<TransactDto>(1).AsEnumerable();
@@ -173,10 +293,11 @@ namespace WalletSystem.API.Test
             var createdResponse = controller.FundTransfer(_transactDto);
             // Assert 
             await Assert.IsType<Task<IActionResult>>(createdResponse);
+            Assert.NotNull(createdResponse);
         }
 
         [Fact]
-        public async Task FundTransfer_ReturnBadRequest()
+        public async Task FundTransfer_TestCase002()
         {
             // Arrange & Act
             var mockRepo = new Mock<ITransaction>();
@@ -189,7 +310,61 @@ namespace WalletSystem.API.Test
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
         }
-          
+
+        [Fact]
+        public async Task FundTransfer_TestCase003()
+        {
+            // Arrange & Act
+            TransactDto transactDto = new TransactDto()
+            {
+                AccountNumberTo = 121249488198,
+                AccountNumberFrom = 121271789724,
+                Amount = 0
+            };
+            var mockRepo = new Mock<ITransaction>();
+            var controller = new TransactionController(mockRepo.Object); 
+
+            // Act
+            var result = await controller.FundTransfer(model: transactDto);
+
+            // Assert
+            Assert.IsType<ObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task FundTransfer_TestCase004()
+        {
+            // Arrange & Act
+            TransactDto transactDto = new TransactDto()
+            {
+                AccountNumberTo = 0,
+                AccountNumberFrom = 0,
+                Amount = 1000
+            };
+            var mockRepo = new Mock<ITransaction>();
+            var controller = new TransactionController(mockRepo.Object);
+
+            // Act
+            var result = await controller.FundTransfer(model: transactDto);
+
+            // Assert
+            Assert.IsType<ObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task FundTransfer_TestCase006()
+        {
+            // Arrange & Act
+            var mockRepo = new Mock<ITransaction>();
+            var controller = new TransactionController(mockRepo.Object); 
+
+            // Act
+            var result = await controller.FundTransfer(model: null);
+
+            // Assert
+            Assert.IsType<ObjectResult>(result);
+        }
+
         private List<TransactionDto> GetTestSessions()
         {
             var sessions = new List<TransactionDto>();

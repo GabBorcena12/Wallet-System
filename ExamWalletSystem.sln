@@ -5,7 +5,7 @@ VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExamWalletSystem", "ExamWalletSystem\ExamWalletSystem.csproj", "{4663EDD2-A936-419B-A048-6EA9079D2A72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletSystem.API.Test", "WalletSystem.API.Test\WalletSystem.API.Test.csproj", "{CC1264ED-9217-4567-A14F-F1DE0D84BD7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletSystem.API.Test", "WalletSystem.API.Test\WalletSystem.API.Test.csproj", "{CC1264ED-9217-4567-A14F-F1DE0D84BD7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
