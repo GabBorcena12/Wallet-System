@@ -7,14 +7,12 @@ using System.Text.RegularExpressions;
 namespace ExamWalletSystem.Model
 {
     public class User
-    { 
-        
+    {  
         public User()
         {
             AccountNumber = GenerateRandomString(12);
             Balance = 0;
-            RegisterDate = DateTime.Now;    
-
+            RegisterDate = DateTime.Now;     
         }
 
         [Key]

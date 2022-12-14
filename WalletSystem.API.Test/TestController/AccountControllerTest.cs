@@ -121,23 +121,6 @@ namespace WalletSystem.API.Test.TestController
             Assert.IsType<ObjectResult>(result);
         }
 
-        [Fact]
-        public async Task Login_TestCase004()
-        {
-            // Arrange & Act
-            RegisterUserDto userDto = new RegisterUserDto()
-            {
-                UserName = "",
-                Password = ""
-            };
-            var mockRepo = new Mock<IAccount>();
-            var controller = new AccountController(mockRepo.Object);
-
-            // Act
-            var result = await controller.login(userDto);
-
-            // Assert
-            Assert.IsType<ObjectResult>(result);
-        }
+        
     }
 }

@@ -54,7 +54,7 @@ namespace WalletSystem.API.Test
         }
         
         [Fact]
-        public async Task GetAllTransaction()
+        public async Task GetUserTransaction_TestCase001()
         {
             //Arrange
             int count = 3;
@@ -79,7 +79,7 @@ namespace WalletSystem.API.Test
         }
 
         [Fact]
-        public async Task GetAllTransaction_ReturnNoRows()
+        public async Task GetUserTransaction_TestCase002()
         {
             //Arrange
             int count = 0;
@@ -352,7 +352,7 @@ namespace WalletSystem.API.Test
         }
 
         [Fact]
-        public async Task FundTransfer_TestCase006()
+        public async Task FundTransfer_TestCase005()
         {
             // Arrange & Act
             var mockRepo = new Mock<ITransaction>();
