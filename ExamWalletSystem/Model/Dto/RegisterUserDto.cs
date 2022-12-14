@@ -7,9 +7,11 @@ namespace ExamWalletSystem.Model.Dto
     {
         [MaxLength(30)]
         [Required]
+        [DataType(DataType.Text, ErrorMessage = "Username is Required")]
         public string UserName { get; set; }
         [MaxLength(30)]
         [Required]
+        [DataType(DataType.Password, ErrorMessage = "Password is Required")]
         public string Password { get; set; }
     }
 }

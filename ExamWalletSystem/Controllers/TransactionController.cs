@@ -133,12 +133,7 @@ namespace ExamWalletSystem.Controllers
                 {
                     return BadRequest(ModelState);
                 }  
-
-                if (model.AccountNumberFrom == model.AccountNumberTo)
-                {
-                    return StatusCode(StatusCodes.Status400BadRequest, new { message = "Account Numbers must not be the same." });
-                }
-
+                 
                 string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userId == null)
                 {
@@ -146,6 +141,11 @@ namespace ExamWalletSystem.Controllers
                 }
 
                 var result = await _reposiitory.FundTransfer(model, userId);
+
+                if (model.AccountNumberFrom == model.AccountNumberTo)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { message = "Account Numbers must not be the same." });
+                }
 
                 if (result.Status != 200)
                 {

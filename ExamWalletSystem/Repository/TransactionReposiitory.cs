@@ -101,15 +101,7 @@ namespace ExamWalletSystem.Repository
                 }
             }
             else
-            {
-                if (checkBalance <= 0)
-                {
-                    return new AuthResponseDto
-                    {
-                        Status = 400,
-                        Message = "Balance not sufficient."
-                    }; 
-                } 
+            { 
 
                 if (getAccountNumberFrom.UserName != userId)
                 {
@@ -118,7 +110,16 @@ namespace ExamWalletSystem.Repository
                         Status = 400,
                         Message = "Please input your correct Account Number."
                     };
-                }
+                } 
+
+                if (checkBalance <= 0)
+                {
+                    return new AuthResponseDto
+                    {
+                        Status = 400,
+                        Message = "Balance not sufficient."
+                    }; 
+                } 
 
                 return new AuthResponseDto
                 {
@@ -129,9 +130,6 @@ namespace ExamWalletSystem.Repository
         }
         public async Task<AuthResponseDto> Deposit(DepositDto transactionDto, string userId)
         {
-            var mapData = mapper.Map<Transaction>(transactionDto);
-            var getAccountNumberTo = await _db.tblUser.Where(q => q.AccountNumber == transactionDto.AccountNumberTo).FirstOrDefaultAsync();
-
             if (transactionDto.AccountNumberTo <= 0 || transactionDto.Amount <= 0)
             {
                 return new AuthResponseDto
@@ -141,6 +139,9 @@ namespace ExamWalletSystem.Repository
                 };
             }
 
+            var mapData = mapper.Map<Transaction>(transactionDto);
+            var getAccountNumberTo = await _db.tblUser.Where(q => q.AccountNumber == transactionDto.AccountNumberTo).FirstOrDefaultAsync();
+             
             if (getAccountNumberTo.UserName != userId) {
                 return new AuthResponseDto
                 {
@@ -198,13 +199,28 @@ namespace ExamWalletSystem.Repository
         }
         
         public async Task<AuthResponseDto> Withdraw(WithdrawDto transactionDto,string userId)
-        {
+        { 
+            if (transactionDto.AccountNumberFrom <= 0 || transactionDto.Amount <= 0)
+            {
+                return new AuthResponseDto
+                {
+                    Status = 400,
+                    Message = "Please check your data input before proceeding."
+                };
+            }
+
             var mapData = mapper.Map<Transaction>(transactionDto);
 
             var getAccountNumberFrom = await _db.tblUser.Where(q => q.AccountNumber == transactionDto.AccountNumberFrom).FirstOrDefaultAsync();
-
-            //Check Balance available
-            float checkBalance = getAccountNumberFrom.Balance - transactionDto.Amount;
+            
+            if (getAccountNumberFrom == null)
+            {
+                return new AuthResponseDto
+                {
+                    Status = 400,
+                    Message = "Please check your data input before proceeding."
+                };
+            }
 
             if (getAccountNumberFrom.UserName != userId)
             {
@@ -215,13 +231,10 @@ namespace ExamWalletSystem.Repository
                 };
             }
 
-            if (transactionDto.AccountNumberFrom <= 0 || transactionDto.Amount <= 0) {
-                return new AuthResponseDto
-                {
-                    Status = 400,
-                    Message = "Please check your data input before proceeding."
-                };
-            }
+            //Check Balance available
+            float checkBalance = getAccountNumberFrom.Balance - transactionDto.Amount;
+
+            
             if (checkBalance >= 0)
             {
                 try

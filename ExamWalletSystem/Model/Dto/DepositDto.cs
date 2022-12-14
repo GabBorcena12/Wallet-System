@@ -1,8 +1,12 @@
-﻿namespace ExamWalletSystem.Model.Dto
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ExamWalletSystem.Model.Dto
 {
     public class DepositDto
-    { 
-        public long AccountNumberTo { get; set; }
+    {
+        [Required] 
+        public long AccountNumberTo { get; set; } 
+        [Required]
         public float Amount { get; set; }
     }
 }

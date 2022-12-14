@@ -9,12 +9,15 @@ namespace ExamWalletSystem.Model
         [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; } 
-        public long AccountNumberFrom { get; set; } 
+        public int Id { get; set; }
+        [MaxLength(12)]
+        public long AccountNumberFrom { get; set; }
+        [MaxLength(12)]
         public long AccountNumberTo { get; set; }
+        [MaxLength(50)]
         public string TransactionType { get; set; }
         public float Amount { get; set; }
-        public float EndBalance { get; set; }
+        public float EndBalance { get; set; } 
         public DateTime DateOfTransaction { get; set; }
         [Timestamp]
         public byte[] Version { get; set; }
